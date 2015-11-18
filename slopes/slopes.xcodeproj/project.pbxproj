@@ -19,6 +19,7 @@
 		2770FCEB1BFC52AB00F26860 /* SlopeAngleFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2770FCEA1BFC52AB00F26860 /* SlopeAngleFormatterTests.swift */; };
 		2770FCEC1BFC53FD00F26860 /* SlopeAngleFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2770FCE71BFC470B00F26860 /* SlopeAngleFormatter.swift */; };
 		2770FCEE1BFC59D600F26860 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2770FCED1BFC59D600F26860 /* AVFoundation.framework */; };
+		2770FCF01BFD096000F26860 /* SlopeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2770FCEF1BFD096000F26860 /* SlopeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		2770FCE91BFC52AA00F26860 /* slopesTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "slopesTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		2770FCEA1BFC52AB00F26860 /* SlopeAngleFormatterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlopeAngleFormatterTests.swift; sourceTree = "<group>"; };
 		2770FCED1BFC59D600F26860 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		2770FCEF1BFD096000F26860 /* SlopeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlopeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 				2770FCE11BFC21BA00F26860 /* MotionController.swift */,
 				2770FCE51BFC3EEC00F26860 /* Extensions.swift */,
 				2770FCE71BFC470B00F26860 /* SlopeAngleFormatter.swift */,
+				2770FCEF1BFD096000F26860 /* SlopeView.swift */,
 			);
 			path = slopes;
 			sourceTree = "<group>";
@@ -217,6 +220,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2770FCF01BFD096000F26860 /* SlopeView.swift in Sources */,
 				2770FCE81BFC470B00F26860 /* SlopeAngleFormatter.swift in Sources */,
 				2770FCC41BFC212500F26860 /* ViewController.swift in Sources */,
 				2770FCE21BFC21BA00F26860 /* MotionController.swift in Sources */,

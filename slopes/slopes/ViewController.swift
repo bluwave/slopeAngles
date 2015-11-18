@@ -19,6 +19,7 @@ class ViewController: UIViewController, MotionControllerDelegate {
 
     @IBOutlet weak var degreeLabel: UILabel!
     @IBOutlet weak var videoContainer: UIView!
+    @IBOutlet weak var slopeView: SlopeView!
     let motionController = MotionController()
     let slopeAngleFormatter = SlopeAngleFormatter()
     let avSession = AVCaptureSession()
@@ -27,18 +28,29 @@ class ViewController: UIViewController, MotionControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureCaptureDevice()
         motionController.delegate = self
+        configureSlopeView()
+        configureDegreeLabel()
+    }
+
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        authorizeCamera {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)) {
+                [weak self] in
+                if let weakself = self {
+                    weakself.configureCaptureDevice()
+                    weakself.configureVideoLayer()
+                    weakself.startVideoCapture()
+                }
+            }
+        }
     }
 
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        authorizeCamera {
-            () -> Void in
-            self.configureVideoLayer()
-            self.startVideoCapture()
-        }
         motionController.monitorForMotion()
+        adjustVideoCaptureLayerBounds()
     }
 
     override func viewWillDisappear(animated: Bool) {
@@ -48,14 +60,45 @@ class ViewController: UIViewController, MotionControllerDelegate {
     }
 
     //  MARK: - configure
+
+    private func configureDegreeLabel() {
+        degreeLabel.transform = CGAffineTransformMakeRotation(CGFloat(M_PI / 2.0))
+    }
+
+    private func configureSlopeView() {
+        slopeView.side = .Right
+    }
+
     private func configureVideoLayer() {
         avSession.sessionPreset = AVCaptureSessionPresetHigh
+        addVideoInputToSession(avSession)
         videoLayer = AVCaptureVideoPreviewLayer(session: avSession)
         if let videoLayer = videoLayer {
             videoContainer.layer.addSublayer(videoLayer)
-            videoLayer.frame = self.view.layer.frame
+            adjustVideoCaptureLayerBounds()
         } else {
             showError(.CouldNotCreateCaptureVideoLayer)
+        }
+    }
+
+    func adjustVideoCaptureLayerBounds() {
+        if let videoLayer = videoLayer {
+            videoLayer.frame = self.view.layer.frame
+        }
+    }
+
+    //  TODO - add error as parameter here for caller
+    func addVideoInputToSession(session: AVCaptureSession) {
+        do {
+            guard let captureDevice = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo),
+            let input: AVCaptureDeviceInput? = try AVCaptureDeviceInput(device: captureDevice)
+            else {
+                showError(.NoCaptureDeviceFound)
+                return
+            }
+            session.addInput(input)
+        } catch let error as NSError {
+            showError(error)
         }
     }
 
@@ -76,38 +119,24 @@ class ViewController: UIViewController, MotionControllerDelegate {
     //  MARK: - video control
     //  TODO - move all video to it's own controller
 
-    func authorizeCamera(completionHandler: () -> Void) {
-
+    private func authorizeCamera(completionHandler: () -> Void) {
         AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo, completionHandler: {
             (granted: Bool) -> Void in
             if !granted {
                 dispatch_async(dispatch_get_main_queue(), {
                     self.showError(.NoPermissionToUseCamera)
                 })
-            }
-            else {
+            } else {
                 completionHandler()
             }
         });
     }
 
-    func startVideoCapture() {
-        do {
-            guard let captureDevice = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo),
-            let input: AVCaptureDeviceInput? = try AVCaptureDeviceInput(device: captureDevice)
-            else {
-                showError(.NoCaptureDeviceFound)
-                return
-            }
-
-            avSession.addInput(input)
-            avSession.startRunning()
-        } catch let error as NSError {
-            showError(error)
-        }
+    private func startVideoCapture() {
+        avSession.startRunning()
     }
 
-    func stopVideoCapture() {
+    private func stopVideoCapture() {
         avSession.stopRunning()
     }
 
@@ -119,6 +148,10 @@ class ViewController: UIViewController, MotionControllerDelegate {
 
     func motionControllerDidRecieveNewAngle(motionController: MotionController, angle: Double) {
         self.degreeLabel.text = slopeAngleFormatter.formatAngle(angle)
+
+        if (angle > 0) {
+            self.slopeView.side = angle > 90 ? .Right : .Left
+        }
     }
 
 //  MARK: - helpers
